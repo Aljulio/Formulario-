@@ -1,0 +1,185 @@
+/* src/FormularioComponent.css */
+
+.form-container {
+  max-width: 500px; /* Ancho máximo para el formulario */
+  margin: 40px auto; /* Centra el formulario horizontalmente y da margen arriba/abajo */
+  padding: 30px; /* Espaciado interno generoso */
+  background-color: #ffffff; /* Fondo blanco para el contenedor */
+  border-radius: 10px; /* Esquinas más redondeadas */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada para un efecto flotante */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente más moderna */
+  color: #333; /* Color de texto general */
+}
+
+.form-container h2 {
+  text-align: center;
+  color: #2c3e50; /* Un azul oscuro para los títulos */
+  margin-bottom: 20px; /* Más espacio debajo del título */
+  font-size: 2.2em; /* Tamaño de fuente un poco más grande para el título */
+  font-weight: 600; /* Un poco más de peso */
+}
+
+.form-container p {
+  text-align: center;
+  margin-bottom: 30px; /* Más espacio debajo del párrafo descriptivo */
+  color: #7f8c8d; /* Color gris suave */
+  font-size: 1.1em; /* Tamaño de fuente ligeramente más grande */
+}
+
+.form-group {
+  margin-bottom: 20px; /* Más espacio entre cada grupo de campo/etiqueta */
+}
+
+.form-group label {
+  display: block; /* Cada etiqueta en su propia línea */
+  margin-bottom: 8px; /* Espacio entre etiqueta y campo */
+  font-weight: bold; /* Texto de etiqueta en negrita */
+  color: #555; /* Color de etiqueta */
+  font-size: 0.95em; /* Tamaño de fuente un poco más pequeño que el general */
+}
+
+.form-group input[type="text"],
+.form-group select {
+  width: 100%; /* Ocupa todo el ancho disponible */
+  padding: 12px 15px; /* Relleno interno */
+  border: 1px solid #ddd; /* Borde suave */
+  border-radius: 5px; /* Esquinas redondeadas */
+  font-size: 1em; /* Tamaño de fuente estándar */
+  box-sizing: border-box; /* Incluye padding y border en el ancho total */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transición suave para el foco */
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+  border-color: #007bff; /* Borde azul al hacer foco */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Sombra suave al hacer foco */
+  outline: none; /* Elimina el contorno de foco predeterminado del navegador */
+}
+
+/* Estilos para mensajes de error */
+.error-message {
+    color: #e74c3c; /* Rojo de error */
+    font-size: 0.85em;
+    margin-top: 5px;
+    font-weight: bold;
+}
+.input-error { /* Clase para resaltar el input con error */
+    border-color: #e74c3c !important; /* Rojo, !important para sobrescribir otros estilos */
+}
+
+/* *************************************
+  * ESTILOS DEL BOTÓN *
+  *************************************
+*/
+.save-button {
+  display: block; /* Para que ocupe su propia línea */
+  width: 100%; /* Ocupa todo el ancho */
+  padding: 15px; /* Relleno interno */
+  background-color: #28a745; /* Fondo verde vibrante */
+  color: white; /* Texto blanco */
+  border: none; /* Sin borde */
+  border-radius: 5px; /* Esquinas ligeramente redondeadas */
+  font-size: 1.1em; /* Fuente un poco más grande */
+  font-weight: bold; /* Texto en negrita */
+  cursor: pointer; /* Cambia el cursor al pasar por encima */
+  /* Transiciones suaves para hover y active */
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; 
+  margin-top: 30px; /* Margen superior para separarlo del último campo */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra inicial para el botón */
+}
+
+.save-button:hover {
+  background-color: #218838; /* Verde más oscuro al pasar el ratón */
+  transform: translateY(-2px); /* Un ligero efecto de levantamiento */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada al hacer hover */
+}
+
+.save-button:active {
+  background-color: #1e7e34; /* Verde aún más oscuro al hacer clic */
+  transform: translateY(0); /* Vuelve a su posición original */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más pequeña al hacer clic */
+}
+
+/* *************************************
+  * ESTILOS PERSONALIZADOS PARA CHECKBOXES Y RADIO-LIKE CHECKBOXES *
+  *************************************
+*/
+
+/* Contenedor general para cada control personalizado (checkbox o radio-like) */
+.custom-control {
+  position: relative;
+  display: inline-flex; /* Usa inline-flex para que se alineen horizontalmente */
+  align-items: center; /* Centra verticalmente el input personalizado y la etiqueta */
+  margin-right: 20px; /* Espacio entre cada opción */
+  margin-bottom: 10px; /* Espacio si las opciones saltan de línea */
+  cursor: pointer; /* Indicar que son clickeables */
+  user-select: none; /* Evita que el texto se seleccione al hacer clic */
+}
+
+/* Ocultar el input nativo pero mantenerlo accesible (para funcionalidad y accesibilidad) */
+.custom-control input[type="checkbox"] { /* Ahora todos son checkboxes */
+  position: absolute;
+  opacity: 0; /* Oculta el input visualmente */
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Estilo base para el pseudo-elemento ::before (el cuadro/círculo visible) */
+.custom-control label::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #555;
+  background-color: #eee;
+  margin-right: 10px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------------- */
+/* ESTILOS ESPECÍFICOS PARA CHECKBOXES CUADRADOS (como "21 años o más", "modelos de coches") */
+/* ---------------------------------------------------------------------- */
+.custom-control:not(.radio-like) label::before {
+  border-radius: 4px; /* Cuadrado con esquinas redondeadas */
+}
+
+/* Estilo cuando el CHECKBOX CUADRADO está marcado */
+.custom-control:not(.radio-like) input[type="checkbox"]:checked + label::before {
+  background-color: #28a745; /* Fondo verde cuando marcado */
+  border-color: #28a745; /* Borde verde cuando marcado */
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3); /* Sombra suave para indicar selección */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.753l-3.59 3.617-1.48-1.47a.75.75 0 00-1.06 1.06l2.03 2.03a.75.75 0 001.06 0l4.14-4.14a.75.75 0 00-1.06-1.06z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 70%;
+}
+
+/* Efecto al hacer hover sobre el CHECKBOX CUADRADO */
+.custom-control:not(.radio-like) input[type="checkbox"]:not(:checked) + label:hover::before {
+  border-color: #007bff;
+}
+
+/* ---------------------------------------------------------------------- */
+/* ESTILOS ESPECÍFICOS PARA CHECKBOXES CON APARIENCIA DE RADIO BUTTON (para "Género") */
+/* ---------------------------------------------------------------------- */
+.custom-control.radio-like label::before {
+  border-radius: 50%; /* Esto lo hace redondo */
+}
+
+/* Estilo cuando el CHECKBOX RADIO-LIKE está marcado */
+.custom-control.radio-like input[type="checkbox"]:checked + label::before {
+  background-color: #007bff; /* Fondo azul cuando marcado */
+  border-color: #007bff; /* Borde azul cuando marcado */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Sombra suave para indicar selección */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e"); /* SVG de un punto blanco */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50%; /* Ajusta el tamaño del punto SVG */
+}
+
+/* Efecto al hacer hover sobre el CHECKBOX RADIO-LIKE */
+.custom-control.radio-like input[type="checkbox"]:not(:checked) + label:hover::before {
+  border-color: #28a745; /* Cambia el borde a verde al hacer hover si no está marcado */
+}

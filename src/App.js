@@ -1,23 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+// client/src/App.js
+
+import React from 'react';
+import FormularioComponent from './FormularioComponent'; // Importa tu componente del formulario
+import './App.css'; // Mantenemos el import de App.css, pero su contenido estará vacío
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* Aquí renderizamos nuestro componente de formulario.
+          Todo el contenido de la aplicación se mostrará a través de este componente. */}
+      <FormularioComponent />
     </div>
   );
 }
