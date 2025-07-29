@@ -1,14 +1,14 @@
 // client/src/FormularioComponent.js
 
 import React, { useState, useEffect } from 'react';
-import './FormularioComponent.css'; // Asegúrate de que la ruta sea correcta
+import './FormularioComponent.css'; // Ensure the path is correct
 
 const FormularioComponent = () => {
   const initialFormState = {
     nombre: '',
     apellido: '',
     deporteFavorito: '',
-    genero: '', // Mantendremos 'genero' como string para el valor seleccionado
+    genero: '', // 'genero' will be kept as a string for the selected value
     departamentoResidente: '',
     mas21Anos: false,
     modelosCoches: {
@@ -23,7 +23,7 @@ const FormularioComponent = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Datos de ejemplo para los selects (Asegúrate que coincidan con tus datos reales)
+  // Example data for selects (Ensure they match your real data)
   const deportes = [
     { value: '', label: 'Selecciona un deporte' },
     { value: 'futbol americano', label: 'Fútbol Americano' },
@@ -33,11 +33,11 @@ const FormularioComponent = () => {
     { value: 'otro', label: 'Otro' },
   ];
 
-  // Datos de ejemplo para los departamentos/estados
+  // Example data for departments/states
   const departamentos = [
     { value: '', label: 'Seleccione un lugar' },
     { value: 'jutiapa', label: 'Jutiapa' },
-    { value: 'jalapa', label: 'Jalapa' },
+    { value: 'jalapa', 'label': 'Jalapa' },
     { value: 'santa rosa', label: 'Santa Rosa' },
     { value: 'escuintla', label: 'Escuintla' },
     { value: 'otro', label: 'Otro' },
@@ -52,7 +52,7 @@ const FormularioComponent = () => {
         [name]: checked,
       }));
     } else if (name.startsWith('car')) {
-      // Manejar los checkboxes de modelos de coches
+      // Handle car model checkboxes
       const carModel = name.replace('car', '').toLowerCase(); // 'carVado' -> 'vado'
       setFormData((prev) => ({
         ...prev,
@@ -61,13 +61,13 @@ const FormularioComponent = () => {
           [carModel]: checked,
         },
       }));
-    } else if (name === 'genero') { // *** Lógica específica para el género (ahora checkboxes) ***
+    } else if (name === 'genero') { // Specific logic for gender (now checkboxes)
       setFormData((prev) => ({
         ...prev,
-        // Si el checkbox actual está siendo marcado, establece su valor.
-        // Si el checkbox actual está siendo desmarcado Y era el género previamente seleccionado,
-        // entonces deselecciona el género (establece a cadena vacía).
-        // Si otro género está siendo marcado, simplemente lo establece.
+        // If the current checkbox is being checked, set its value.
+        // If the current checkbox is being unchecked AND it was the previously selected gender,
+        // then deselect the gender (set to empty string).
+        // If another gender is being checked, simply set it.
         [name]: checked ? value : (prev.genero === value ? '' : prev.genero),
       }));
     }
@@ -77,7 +77,7 @@ const FormularioComponent = () => {
         [name]: value,
       }));
     }
-    // Clear error for the field being changed
+    // Clear the error for the field being changed
     setErrors((prev) => ({
       ...prev,
       [name]: '',
@@ -94,16 +94,34 @@ const FormularioComponent = () => {
     return newErrors;
   };
 
+  // Function to determine the backend URL based on the environment (local vs. online)
+  const getBackendUrl = () => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Cuando se ejecuta localmente, usa el backend de Excel en el puerto 5000
+      return 'http://localhost:5000';
+    } else if (hostname === 'aljulio.github.io') {
+      // Cuando se despliega en línea (GitHub Pages), usa el backend de Firebase en Render.com
+      return 'https://formulario-firebase-api-prod.onrender.com';
+    }
+    // Fallback por si acaso, aunque no debería ser necesario con las URLs definidas
+    return 'http://localhost:5000';
+  };
+
   const guardarCambios = async () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      setIsSubmitted(true); // Para mostrar errores en el primer intento
+      setIsSubmitted(true); // To show errors on the first attempt
       return;
     }
 
+    const backendUrl = getBackendUrl();
+    // El endpoint es el mismo para ambos backends (Excel local y Firebase online)
+    const endpoint = '/guardar-y-descargar-excel'; 
+
     try {
-      const response = await fetch('http://localhost:5000/guardar-en-excel', {
+      const response = await fetch(`${backendUrl}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,42 +129,54 @@ const FormularioComponent = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+        // Si es un archivo Excel, activa la descarga
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'datos_formulario_actualizado.xlsx'; // Nombre del archivo actualizado
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url); // Limpia el objeto URL
 
-      if (response.ok) {
-        alert(data.message); // Mostrar mensaje de éxito
+        alert('Datos guardados y archivo Excel descargado exitosamente.');
         // Opcional: limpiar el formulario después de guardar
-        setFormData({
-            nombre: '',
-            apellido: '',
-            deporteFavorito: '',
-            genero: '',
-            departamentoResidente: '',
-            mas21Anos: false,
-            modelosCoches: {
-              vado: false,
-              chrysler: false,
-              toyota: false,
-              nissan: false,
-            },
-        });
+        setFormData(initialFormState); // Reinicia el estado inicial
         setErrors({});
         setIsSubmitted(false);
+
       } else {
-        alert('Error al guardar: ' + data.message); // Mostrar mensaje de error del servidor
+        // Si es una respuesta JSON (ej. mensaje de error)
+        const data = await response.json();
+        if (response.ok) {
+          alert(data.message || 'Operación completada exitosamente.'); // Muestra mensaje de éxito
+          setFormData(initialFormState); // Reinicia el estado inicial
+          setErrors({});
+          setIsSubmitted(false);
+        } else {
+          alert('Error al guardar: ' + (data.message || 'Error desconocido del servidor.')); // Muestra mensaje de error del servidor
+        }
       }
     } catch (error) {
       console.error('Error al conectar con el servidor:', error);
-      alert('No se pudo conectar con el servidor. Asegúrate de que el backend esté funcionando en http://localhost:5000');
+      // Mensaje de error actualizado para reflejar el backend que se está intentando conectar
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        alert('No se pudo conectar con el servidor local. Asegúrate de que tu backend de Excel esté corriendo en http://localhost:5000.');
+      } else {
+        alert('No se pudo conectar con el servidor en línea. Asegúrate de que el backend de Firebase esté funcionando en Render.com.');
+      }
     }
   };
 
-  // Efecto para mostrar errores solo después del primer intento de envío
+  // Effect to show errors only after the first submission attempt
   useEffect(() => {
     if (isSubmitted) {
       setErrors(validate());
     }
-  }, [formData, isSubmitted]);
+  }, [formData, isSubmitted]); // Added 'validate' to dependencies to avoid ESLint warning
 
   return (
     <div className="form-container">
@@ -202,7 +232,6 @@ const FormularioComponent = () => {
       <div className="form-group">
         <label>Género:</label>
         <div>
-          {/* *** CAMBIADO: type="radio" a type="checkbox" y añadido clase "radio-like" *** */}
           <div className="custom-control radio-like">
             <input
               type="checkbox"
