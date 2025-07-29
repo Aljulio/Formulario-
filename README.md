@@ -1,70 +1,112 @@
-# Getting Started with Create React App
+# Proyecto Formulario de Registro
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este proyecto es una aplicación web de dos partes (frontend y backend) diseñada para recopilar información de un formulario en línea y guardarla en un archivo Excel localmente.
 
-## Available Scripts
+## Estructura del Proyecto
 
-In the project directory, you can run:
+El proyecto está organizado en una estructura de monorepo simple, lo que significa que la aplicación frontend y el servidor backend residen en la misma carpeta raíz, pero en directorios separados.
 
-### `npm start`
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Formulario/
+├── client/          \# Contiene la aplicación web (Frontend)
+│   ├── public/
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── FormularioComponent.js
+│   │   ├── FormularioComponent.css
+│   │   └── ... (otros archivos de React)
+│   ├── package.json
+│   └── ... (otros archivos de configuración de React)
+└── server/          \# Contiene el servidor (Backend)
+├── index.js     \# Lógica principal del servidor
+├── datos\_formulario.xlsx \# Este archivo se crea/actualiza aquí
+├── package.json
+└── ... (otros archivos de Node.js)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+````
 
-### `npm test`
+### **`client/` (El Frontend)**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* **Tecnología:** Desarrollado con **React.js**.
+* **Función:** Es la interfaz de usuario que el usuario ve y con la que interactúa en el navegador. Se encarga de mostrar el formulario, manejar las entradas del usuario, realizar validaciones básicas y enviar los datos al backend.
 
-### `npm run build`
+### **`server/` (El Backend)**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* **Tecnología:** Desarrollado con **Node.js** y **Express.js**. Utiliza la librería `xlsx` para la manipulación de archivos Excel.
+* **Función:** Es el servidor que se ejecuta en tu máquina local. Recibe los datos enviados por el frontend, los procesa y los guarda de forma estructurada en un archivo Excel (`datos_formulario.xlsx`) ubicado dentro de esta misma carpeta. También maneja la lógica para actualizar registros existentes o añadir nuevos.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Cómo Clonar y Ejecutar el Proyecto Localmente
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Sigue estos pasos para poner en marcha el proyecto en tu máquina local.
 
-### `npm run eject`
+### **Requisitos Previos**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Asegúrate de tener instalado lo siguiente:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* **Node.js y npm:** Puedes descargarlo desde [nodejs.org](https://nodejs.org/). `npm` se instala junto con Node.js.
+* **Git:** Para clonar el repositorio. Puedes descargarlo desde [git-scm.com](https://git-scm.com/).
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### **Pasos de Configuración y Ejecución**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1.  **Clonar el Repositorio:**
+    Abre tu terminal o línea de comandos y ejecuta el siguiente comando para clonar el repositorio en tu computadora:
 
-## Learn More
+    ```bash
+    git clone [URL_DE_TU_REPOSITORIO]
+    # Asegúrate de reemplazar [URL_DE_TU_REPOSITORIO] con la URL real de tu repositorio de GitHub.
+    # Ejemplo: git clone [https://github.com/Aljulio/Formulario-.git](https://github.com/Aljulio/Formulario-.git)
+    ```
+    Luego, navega a la carpeta principal del proyecto:
+    ```bash
+    cd NombreDeTuCarpetaClonada
+    ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2.  **Configurar e Iniciar el Backend:**
+    Primero, navega a la carpeta del servidor:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    ```bash
+    cd server
+    ```
+    Instala las dependencias de Node.js:
 
-### Code Splitting
+    ```bash
+    npm install
+    ```
+    Inicia el servidor backend. **Mantén esta terminal abierta y el servidor en ejecución.**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+    ```bash
+    node index.js
+    ```
+    Verás un mensaje indicando que el servidor está escuchando en `http://localhost:5000`.
 
-### Analyzing the Bundle Size
+3.  **Configurar e Iniciar el Frontend:**
+    Abre **una nueva terminal o ventana de comandos**. Navega de vuelta a la raíz del proyecto y luego a la carpeta del cliente:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    ```bash
+    cd .. # Esto te lleva de la carpeta 'server' a la raíz del proyecto.
+    cd client
+    ```
+    Instala las dependencias de React:
 
-### Making a Progressive Web App
+    ```bash
+    npm install
+    ```
+    Inicia la aplicación frontend:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+    ```bash
+    npm start
+    ```
+    Esto abrirá automáticamente tu navegador en `http://localhost:3000` (o un puerto similar) donde podrás ver y usar el formulario.
 
-### Advanced Configuration
+### **Uso y Verificación Local**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+* Con el backend (`node index.js`) y el frontend (`npm start`) corriendo en sus respectivas terminales, puedes llenar el formulario en `http://localhost:3000`.
+* Al hacer clic en el botón "Guardar cambios", los datos se enviarán a tu backend local.
+* El backend procesará los datos y los guardará en el archivo `datos_formulario.xlsx` ubicado en la carpeta `server/` de tu proyecto. Puedes abrir este archivo con Microsoft Excel o un programa compatible para verificar los datos.
+````
 
-### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
