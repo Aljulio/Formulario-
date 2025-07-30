@@ -31,8 +31,35 @@ app.get('/', (req, res) => {
   res.send('¡Servidor Node.js con Express funcionando para Excel local!');
 });
 
-// Ruta para guardar los datos del formulario en el archivo Excel
-// ¡CAMBIO DE ENDPOINT A /guardar-y-descargar-excel para consistencia con el backend de Firebase!
+// NUEVO ENDPOINT: Ruta para descargar el archivo Excel existente
+app.get('/descargar-excel', (req, res) => {
+    // Asegúrate de que la ruta del archivo Excel sea correcta
+    const excelFilePath = path.join(__dirname, 'datos_formulario.xlsx');
+
+    // Verificar si el archivo existe
+    if (fs.existsSync(excelFilePath)) {
+        res.download(excelFilePath, 'datos_formulario.xlsx', (err) => {
+            if (err) {
+                console.error('Error al descargar el archivo Excel:', err);
+                // Si el archivo está abierto o bloqueado, el error.code puede ser 'EBUSY', 'EPERM', 'EACCES'
+                let errorMessage = 'Error interno del servidor al descargar el archivo.';
+                if (err.code === 'EBUSY' || err.code === 'EPERM' || err.code === 'EACCES') {
+                    errorMessage = 'Error: El archivo Excel "datos_formulario.xlsx" está abierto o bloqueado. Por favor, ciérrelo antes de descargarlo.';
+                }
+                res.status(500).send(errorMessage);
+            } else {
+                console.log('Archivo Excel descargado con éxito.');
+            }
+        });
+    } else {
+        // Si el archivo no existe, enviar un mensaje de error 404
+        res.status(404).send('El archivo Excel no existe en el servidor. Por favor, guarda algunos datos primero.');
+    }
+});
+
+
+// ENDPOINT MODIFICADO: Ruta para guardar los datos del formulario en el archivo Excel
+// Ahora SOLO guarda los datos, NO descarga el archivo automáticamente.
 app.post('/guardar-y-descargar-excel', (req, res) => {
     const formData = req.body;
     console.log('\n--- Solicitud de guardado recibida ---');
@@ -54,7 +81,7 @@ app.post('/guardar-y-descargar-excel', (req, res) => {
         formData.modelosCoches.chrysler ? 'X' : '',
         formData.modelosCoches.toyota ? 'X' : '',
         formData.modelosCoches.nissan ? 'X' : '',
-        new Date().toLocaleString() // Marca de tiempo de la última actualización
+        new Date().toLocaleString('es-GT', { timeZone: 'America/Guatemala' }) // ¡MODIFICADO: Zona horaria de Guatemala!
     ];
 
     try {
@@ -152,10 +179,8 @@ app.post('/guardar-y-descargar-excel', (req, res) => {
         XLSX.writeFile(workbook, EXCEL_FILE_PATH);
         console.log('Datos guardados en Excel con éxito.');
         
-        // Enviar el archivo Excel para descarga
-        res.setHeader('Content-Disposition', 'attachment; filename=datos_formulario_actualizado.xlsx');
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.send(XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' }));
+        // ¡CAMBIO AQUÍ! Ahora solo envía una respuesta de éxito, NO el archivo Excel
+        res.status(200).json({ message: 'Datos guardados en Excel con éxito.' });
 
     } catch (error) {
         console.error('[ERROR] Error final al procesar/escribir en el archivo Excel:', error);
