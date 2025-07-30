@@ -95,7 +95,7 @@ const FormularioComponent = () => {
   };
 
   // Function to determine the backend URL based on the environment (local vs. online)
-  const getBackendUrl = (forDownload = false) => {
+  const getBackendUrl = () => {
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       // Cuando se ejecuta localmente, usa el backend de Excel en el puerto 5000
@@ -154,6 +154,9 @@ const FormularioComponent = () => {
   const handleDescargarExcel = async () => {
     const backendUrl = getBackendUrl(); // Obtiene la URL base del backend
     const downloadEndpoint = '/descargar-excel'; // Endpoint para la descarga de Excel
+
+    // Se ELIMINA la condición que impedía la descarga en línea.
+    // Ahora, si estás en GitHub Pages, intentará descargar desde Render.com.
 
     try {
       const response = await fetch(`${backendUrl}${downloadEndpoint}`);
