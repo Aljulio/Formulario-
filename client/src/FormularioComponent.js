@@ -129,36 +129,16 @@ const FormularioComponent = () => {
         body: JSON.stringify(formData),
       });
 
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-        // Si es un archivo Excel, activa la descarga
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'datos_formulario_actualizado.xlsx'; // Nombre del archivo actualizado
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url); // Limpia el objeto URL
-
-        alert('Datos guardados y archivo Excel descargado exitosamente.');
-        // Opcional: limpiar el formulario después de guardar
+      // Si el backend de Excel ahora solo envía un JSON de éxito
+      if (response.ok) {
+        const data = await response.json(); // Espera un JSON de respuesta
+        alert(data.message || 'Datos guardados exitosamente.'); // Muestra el mensaje del backend
         setFormData(initialFormState); // Reinicia el estado inicial
         setErrors({});
         setIsSubmitted(false);
-
       } else {
-        // Si es una respuesta JSON (ej. mensaje de error)
-        const data = await response.json();
-        if (response.ok) {
-          alert(data.message || 'Operación completada exitosamente.'); // Muestra mensaje de éxito
-          setFormData(initialFormState); // Reinicia el estado inicial
-          setErrors({});
-          setIsSubmitted(false);
-        } else {
-          alert('Error al guardar: ' + (data.message || 'Error desconocido del servidor.')); // Muestra mensaje de error del servidor
-        }
+        const errorData = await response.json(); // Intenta leer el error como JSON
+        alert('Error al guardar: ' + (errorData.message || 'Error desconocido del servidor.'));
       }
     } catch (error) {
       console.error('Error al conectar con el servidor:', error);
@@ -168,6 +148,52 @@ const FormularioComponent = () => {
       } else {
         alert('No se pudo conectar con el servidor en línea. Asegúrate de que el backend de Firebase esté funcionando en Render.com.');
       }
+    }
+  };
+
+  // NUEVA FUNCIÓN: Para descargar el archivo Excel
+  const handleDescargarExcel = async () => {
+    const backendUrl = getBackendUrl();
+    const downloadEndpoint = '/descargar-excel'; // Nuevo endpoint para la descarga
+
+    // NOTA IMPORTANTE: Este botón de descarga de Excel solo funcionará con el backend local (Excel).
+    // Tu backend de Firebase en Render.com no está configurado para servir archivos estáticos así.
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      alert('La descarga directa del archivo Excel solo está disponible en el entorno local (desarrollo).');
+      return; // Salir si no estamos en localhost
+    }
+
+    try {
+      const response = await fetch(`${backendUrl}${downloadEndpoint}`);
+
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+          // Si es un archivo Excel, activa la descarga
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'datos_formulario_actualizado.xlsx'; // Nombre del archivo a descargar
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+          alert('Archivo Excel descargado exitosamente.');
+        } else {
+          // Si no es un Excel (ej. error 404 o mensaje de texto)
+          const errorText = await response.text();
+          console.error('Error al descargar el archivo Excel:', errorText);
+          alert('Error al descargar el archivo Excel: ' + errorText);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error('Error del servidor al descargar el archivo Excel:', response.status, errorText);
+        alert('Error del servidor al descargar el archivo Excel: ' + (errorText || response.statusText));
+      }
+    } catch (error) {
+      console.error('Error de red al intentar descargar el archivo Excel:', error);
+      alert('Error de red al intentar descargar el archivo Excel. Asegúrate de que el backend de Excel esté corriendo.');
     }
   };
 
@@ -346,9 +372,16 @@ const FormularioComponent = () => {
         </div>
       </div>
 
-      <button type="button" className="save-button" onClick={guardarCambios}>
-        Guardar cambios
-      </button>
+      {/* Botones de acción */}
+      <div className="button-group">
+        <button type="button" className="save-button" onClick={guardarCambios}>
+          Guardar cambios
+        </button>
+        {/* Botón de Descargar Excel con la misma clase de estilo */}
+        <button type="button" className="save-button" onClick={handleDescargarExcel}>
+          Descargar Excel
+        </button>
+      </div>
     </div>
   );
 };
