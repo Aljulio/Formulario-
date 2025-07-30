@@ -95,7 +95,7 @@ const FormularioComponent = () => {
   };
 
   // Function to determine the backend URL based on the environment (local vs. online)
-  const getBackendUrl = () => {
+  const getBackendUrl = (forDownload = false) => {
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       // Cuando se ejecuta localmente, usa el backend de Excel en el puerto 5000
@@ -104,7 +104,7 @@ const FormularioComponent = () => {
       // Cuando se despliega en línea (GitHub Pages), usa el backend de Firebase en Render.com
       return 'https://formulario-firebase-api-prod.onrender.com';
     }
-    // Fallback por si acaso, aunque no debería ser necesario con las URLs definidas
+    // Fallback por si acaso
     return 'http://localhost:5000';
   };
 
@@ -129,7 +129,6 @@ const FormularioComponent = () => {
         body: JSON.stringify(formData),
       });
 
-      // Si el backend de Excel ahora solo envía un JSON de éxito
       if (response.ok) {
         const data = await response.json(); // Espera un JSON de respuesta
         alert(data.message || 'Datos guardados exitosamente.'); // Muestra el mensaje del backend
@@ -151,17 +150,10 @@ const FormularioComponent = () => {
     }
   };
 
-  // NUEVA FUNCIÓN: Para descargar el archivo Excel
+  // FUNCIÓN ACTUALIZADA: Para descargar el archivo Excel (funciona local y online)
   const handleDescargarExcel = async () => {
-    const backendUrl = getBackendUrl();
-    const downloadEndpoint = '/descargar-excel'; // Nuevo endpoint para la descarga
-
-    // NOTA IMPORTANTE: Este botón de descarga de Excel solo funcionará con el backend local (Excel).
-    // Tu backend de Firebase en Render.com no está configurado para servir archivos estáticos así.
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      alert('La descarga directa del archivo Excel solo está disponible en el entorno local (desarrollo).');
-      return; // Salir si no estamos en localhost
-    }
+    const backendUrl = getBackendUrl(); // Obtiene la URL base del backend
+    const downloadEndpoint = '/descargar-excel'; // Endpoint para la descarga de Excel
 
     try {
       const response = await fetch(`${backendUrl}${downloadEndpoint}`);
@@ -183,7 +175,7 @@ const FormularioComponent = () => {
         } else {
           // Si no es un Excel (ej. error 404 o mensaje de texto)
           const errorText = await response.text();
-          console.error('Error al descargar el archivo Excel:', errorText);
+          console.error('Error al descargar el archivo Excel (no es un archivo Excel):', errorText);
           alert('Error al descargar el archivo Excel: ' + errorText);
         }
       } else {
@@ -193,7 +185,7 @@ const FormularioComponent = () => {
       }
     } catch (error) {
       console.error('Error de red al intentar descargar el archivo Excel:', error);
-      alert('Error de red al intentar descargar el archivo Excel. Asegúrate de que el backend de Excel esté corriendo.');
+      alert('Error de red al intentar descargar el archivo Excel. Asegúrate de que el backend esté corriendo.');
     }
   };
 
